@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description:
+  Create Budgets
+# ------------------------------------------------------------#
+#  Metadata
+# ------------------------------------------------------------#
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "Set BdugetAlarts"
+        Parameters:
+          - Ammount
+          - ThreshouldHigh
+          - ThreshouldMid
+          - ThreshouldLow
+          - MailAddress
+
+# ------------------------------------------------------------#
+#  InputParameters
+# ------------------------------------------------------------#
+Parameters:
+  Ammount:
+    Type: String
+    Default: 300
+    Description: Budget Limit Amount
+  ThreshouldHigh:
+    Type: Number
+    Default: 100
+    MinValue: 50
+    MaxValue: 200
+    Description: 50-200 % of budgeted amount(High)
+  ThreshouldMid:
+    Type: Number
+    Default: 80
+    MinValue: 50
+    MaxValue: 200
+    Description: 50-200 % of budgeted amount(Middle)
+  ThreshouldLow:
+    Type: Number
+    Default: 50
+    MinValue: 5
+    MaxValue: 200
+    Description: 50-200 % of budgeted amount(Low)
+
+# ------------------------------------------------------------#
+#  Resources
+# ------------------------------------------------------------#
+Resources:
+# ------------------------------------------------------------#
+#  Budget
+# ------------------------------------------------------------#    
+  BudgetAlarts:
+    Type: "AWS::Budgets::Budget"
+    Properties:
+      Budget:
+        BudgetLimit:
+          Amount: !Ref Ammount
+          Unit: USD
+        TimeUnit: MONTHLY
+        BudgetType: COST
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: !Ref ThreshouldHigh
+          Subscribers:
+            - SubscriptionType: SNS
+              Address: !ImportValue cfn-sns-topic-inamura-arn
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: !Ref ThreshouldMid
+          Subscribers:
+          - SubscriptionType: SNS
+            Address: !ImportValue cfn-sns-topic-inamura-arn
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: !Ref ThreshouldLow
+          Subscribers:
+          - SubscriptionType: SNS
+            Address: !ImportValue cfn-sns-topic-inamura-arn
