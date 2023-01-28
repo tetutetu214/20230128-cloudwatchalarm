@@ -8,8 +8,9 @@ Metadata:
   "AWS::CloudFormation::Interface":
     ParameterGroups:
       - Label:
-          default: "Set BdugetAlarts"
+          default: "AWS Budget Configuration"
         Parameters:
+          - BudgetName
           - Ammount
           - ThreshouldHigh
           - ThreshouldMid
@@ -19,6 +20,10 @@ Metadata:
 #  InputParameters
 # ------------------------------------------------------------#
 Parameters:
+  BudgetName:
+    Type: String
+    Default: CloudDivision-Budget
+    Description: Budget Name
   Ammount:
     Type: String
     Default: 300
@@ -27,32 +32,33 @@ Parameters:
     Type: Number
     Default: 100
     MinValue: 50
-    MaxValue: 200
-    Description: 50-200 % of budgeted amount(High)
+    MaxValue: 100
+    Description: 50-100 % of budgeted AmountHigh
   ThreshouldMid:
     Type: Number
     Default: 80
     MinValue: 50
-    MaxValue: 200
-    Description: 50-200 % of budgeted amount(Middle)
+    MaxValue: 100
+    Description: 50-100 % of budgeted AmountMiddle
   ThreshouldLow:
     Type: Number
     Default: 50
     MinValue: 5
-    MaxValue: 200
-    Description: 50-200 % of budgeted amount(Low)
+    MaxValue: 100
+    Description: 50-100 % of budgeted AmountLow
 
 # ------------------------------------------------------------#
 #  Resources
 # ------------------------------------------------------------#
 Resources:
 # ------------------------------------------------------------#
-#  Budget
+#  BudgetAlarts
 # ------------------------------------------------------------#    
   BudgetAlarts:
     Type: "AWS::Budgets::Budget"
     Properties:
       Budget:
+        BudgetName: !Ref BudgetName
         BudgetLimit:
           Amount: !Ref Ammount
           Unit: USD
